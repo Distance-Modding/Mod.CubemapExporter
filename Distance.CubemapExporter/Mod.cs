@@ -32,11 +32,5 @@ namespace Distance.CubemapExporter
 
 			RuntimePatcher.AutoPatch();
 		}
-
-		public IEnumerator Start()
-		{
-			yield return new WaitForEndOfFrame();
-			SceneManager.LoadScene("MainMenu");
-		}
 	}
 }

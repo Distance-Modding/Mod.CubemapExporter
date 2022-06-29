@@ -13,35 +13,43 @@ namespace Distance.CubemapExporter.Scripts
 	{
 		public IEnumerator Export(LevelCubeMapRenderer renderer)
 		{
+			#region Save File Dialog
 			FileDialog exportDialog = ExportDirectoryDialog();
 			if (exportDialog.ShowDialog() != DialogResult.OK)
 			{
 				yield break;
 			}
 			FileInfo destination = new FileInfo(exportDialog.FileName);
+			#endregion
 
+			#region Caching current state
 			LevelEditor editor = G.Sys.LevelEditor_;
 			LevelLayer trackNodes = editor.WorkingLevel_.GetLayer(LAYER_TRACKNODES);
 			bool trackNodesVisible = trackNodes.Visible_;
-			trackNodes.Visible_ = false;
-
-			editor.ToggleHelperDisplayMode(HelperDisplayMode.DontDisplay);
-			editor.SetCenterPointsActive(false);
-			editor.SetLightIconsActive(false);
 
 			HelperDisplayMode helperDisplay = editor.CenterPointsMode_;
 			Camera camera = renderer.renderCamera_;
 			RenderTexture active = RenderTexture.active;
 			RenderTexture target = renderer.renderCamera_.targetTexture;
 			int mask = camera.cullingMask;
+			#endregion
 
+			#region Setup 
+			editor.ToggleHelperDisplayMode(HelperDisplayMode.DontDisplay);
+			editor.SetCenterPointsActive(false);
+			editor.SetLightIconsActive(false);
+
+			trackNodes.Visible_ = false;
 			RenderTexture canvas = CreateRenderTexture();
 			camera.targetTexture = canvas;
 
 			camera.transform.position = renderer.transform.position;
+			editor.currentAxisGizmoLogic_.gameObject.SetActive(false);
+			#endregion
 
 			yield return new WaitForEndOfFrame();
 
+			#region Take Snapshots
 			Quaternion[] rotations = LevelCubeMapRendererAbstract.camRots_;
 			for (int i = 0; i < rotations.Length; ++i)
 			{
@@ -52,15 +60,19 @@ namespace Distance.CubemapExporter.Scripts
 				camera.Render();
 				SaveToFile(canvas, destination, $" face {i:D8}");
 			}
+			#endregion
 
+			#region Restore State
+			editor.currentAxisGizmoLogic_.gameObject.SetActive(true);
 			editor.SetCenterPointsActive(false);
-			editor.SetLightIconsActive(false); camera.cullingMask = mask;
-
+			editor.SetLightIconsActive(false);
+			camera.cullingMask = mask;
 			camera.targetTexture = target;
 			canvas.Destroy();
 			RenderTexture.active = active;
 			trackNodes.Visible_ = trackNodesVisible;
 			editor.ToggleHelperDisplayMode(helperDisplay);
+			#endregion
 		}
 
 		public void SaveToFile(RenderTexture renderTexture, FileInfo destination, string suffix = "")
