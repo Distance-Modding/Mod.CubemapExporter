@@ -1,11 +1,9 @@
-using System.Collections;
 using Distance.CubemapExporter.Scripts;
 using Reactor.API.Attributes;
 using Reactor.API.Interfaces.Systems;
 using Reactor.API.Logging;
 using Reactor.API.Runtime.Patching;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Distance.CubemapExporter
 {

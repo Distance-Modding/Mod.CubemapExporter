@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using UnityEngine;
@@ -32,6 +33,7 @@ namespace Distance.CubemapExporter.Scripts
 			RenderTexture active = RenderTexture.active;
 			RenderTexture target = renderer.renderCamera_.targetTexture;
 			int mask = camera.cullingMask;
+			GameObject[] selection = editor.SelectedObjects_.ToArray();
 			#endregion
 
 			#region Setup 
@@ -45,6 +47,7 @@ namespace Distance.CubemapExporter.Scripts
 
 			camera.transform.position = renderer.transform.position;
 			editor.currentAxisGizmoLogic_.gameObject.SetActive(false);
+			editor.ClearSelectedList();
 			#endregion
 
 			yield return new WaitForEndOfFrame();
@@ -63,6 +66,7 @@ namespace Distance.CubemapExporter.Scripts
 			#endregion
 
 			#region Restore State
+			editor.SelectObjects(selection);
 			editor.currentAxisGizmoLogic_.gameObject.SetActive(true);
 			editor.SetCenterPointsActive(false);
 			editor.SetLightIconsActive(false);
